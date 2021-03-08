@@ -2,4 +2,4 @@
 
 ## Technologies
 
-node.js, Dockers, elasticSearch,
+node.js, Dockers, elasticSearch
