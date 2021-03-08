@@ -9,7 +9,7 @@ const router = new express.Router()
 //     next()
 //   })
 
-router.post("/garbage", async(req, res) => {
+router.post("/garbage", (req, res) => {
     elasticClient.index({
         index: 'garbage',
         body: {
