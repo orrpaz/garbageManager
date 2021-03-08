@@ -4,7 +4,10 @@ const elasticClient = require('../elasticDB')
 const router = new express.Router()
 
 
-
+// router.use(function timeLog (req, res, next) {
+//     console.log('Time: ', Date.now())
+//     next()
+//   })
 
 router.post("/garbage", async(req, res) => {
     elasticClient.index({
@@ -25,3 +28,4 @@ router.post("/garbage", async(req, res) => {
     })
 })
 
+module.exports = router
