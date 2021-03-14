@@ -1,8 +1,5 @@
 # garbageManager
 
-## Technologies
-
-node.js, Dockers, elasticSearch
 
 ## Description
 
@@ -20,3 +17,8 @@ The service supports RestAPI:
 - retrieve all garbage can on particular location
 - retrieve all garbage can according to date
 - delete garbage can
+
+
+## Technologies
+
+node.js, Dockers, elasticSearch
