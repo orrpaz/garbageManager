@@ -21,4 +21,8 @@ The service supports RestAPI:
 
 ## Technologies
 
-node.js, Dockers, elasticSearch
+- node.js
+- express
+- RestAPI
+- Dockers
+- elasticSearch
