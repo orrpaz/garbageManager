@@ -5,7 +5,7 @@ require('dotenv').config()
 // const User = require('./models/user')
 // const Task = require('./models/task')
 const garbgeRouter = require('./routers/garbage')
-const geocode = require('./utils/geocode')
+// const geocode = require('./utils/geocode')
 // const taskRouter = require('./routers/task')
 
 

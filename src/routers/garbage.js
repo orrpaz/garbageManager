@@ -1,7 +1,9 @@
+const { text } = require('express')
 const express = require('express')
-const elasticClient = require('../elasticDB')
+const {ElasticSearch} = require('../elasticDB')
 
 const router = new express.Router()
+const elasticClient = new ElasticSearch()
 
 
 // router.use(function timeLog (req, res, next) {
@@ -9,9 +11,12 @@ const router = new express.Router()
 //     next()
 //   })
 
-router.post("/garbage", (req, res) => {
+router.post("/garbage", async(req, res) => {
     console.log(`id = ${req.body.id} color = ${req.body.color} type= = ${req.body.type}`)
-    elasticClient.index({
+    try{
+        // const client = elasticClient.getClient()
+        // console.log(client)
+    const response = await elasticClient.getClient().index({
         index: 'garbage',
         body: {
             "id": req.body.id,
@@ -21,20 +26,60 @@ router.post("/garbage", (req, res) => {
             "dateClean": req.body.dateClean
         }
     })
-    .then(response => {
-        return res.json({"message": "Indexing successful"})
-    })
-    .catch(err => {
-         return res.status(500).json({"message": "Error"})
-    })
+     res.status(200).send(response)
+   } catch(e){
+       res.status(500).send(e)
+   } 
+   
 })
 
-router.patch('/garbage/updatelocation',(req,res)=>{
+router.patch('/garbage/updatelocation',async(req,res)=>{
+    console.log("in update location")
+    try{
+        const client = elasticClient.getClient()
+        console.log(client)
+        const response = await client.update({
+            index: 'garbage',
+            type: '_doc',
+            id: req.body.id,
+            // refresh: "wait_for",
+            body: {
+              // put the partial document under the `doc` key
+              doc: {
+                location: req.body.location
+              }
+            }
+          })
+         return res.status(200).send(response)
+    } catch(e){
+        return res.status(500).send(e)
+
+    }
 
 })
 
-router.patch('/garbage/updatedate',(req,res)=>{
+router.patch('/garbage/updatedate',async(req,res)=>{
+    console.log("in update date")
+    try{
+        const client = elasticClient.getClient()
+        console.log(client)
+        const response = await client.update({
+            index: 'garbage',
+            type: '_doc',
+            id: req.body.id,
+            // refresh: "wait_for",
+            body: {
+              // put the partial document under the `doc` key
+              doc: {
+                dateClean : req.body.date
+              }
+            }
+          })
+         return res.status(200).send(response)
+    } catch(e){
+        return res.status(500).send(e)
 
+    }
 })
 
 router.get('/garbage/location',(req,res)=>{
@@ -48,7 +93,22 @@ router.get('/garbage/date',(req,res)=>{
 })
 
 
-router.delete('/garbage/:id',(req,res)=>{
+router.delete('/garbage/:id',async(req,res)=>{
+    console.log(req.params.id)
+    try{
+        const client = elasticClient.getClient()
+        const response = await client.delete({
+            index: 'garbage',
+            type: '_doc',
+            id: req.params.id
+          })
+          console.log("in try delete")
+          console.log(response)
+          res.status(200).send(response)
+    } catch(e) {
+        console.log("in catch delete")
+        return res.status(400).send(e)
+    }
 
 })
 
