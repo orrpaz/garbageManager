@@ -1,4 +1,4 @@
-# garbageManager
+# Garbage can system
 
 
 ## Description
