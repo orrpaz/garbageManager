@@ -1,5 +1,6 @@
 const { text } = require('express')
 const express = require('express')
+const geocode = require('../utils/geocode')
 const {ElasticSearch} = require('../elasticDB')
 
 const router = new express.Router()
@@ -14,15 +15,18 @@ const elasticClient = new ElasticSearch()
 router.post("/garbage", async(req, res) => {
     console.log(`id = ${req.body.id} color = ${req.body.color} type= = ${req.body.type}`)
     try{
+        const coordinate = await geocode(req.body.location)
+        console.log(coordinate)
         // const client = elasticClient.getClient()
         // console.log(client)
     const response = await elasticClient.getClient().index({
         index: 'garbage',
+        type: req.body.type,
         body: {
-            "id": req.body.id,
+            // "id": req.body.id,
             "color": req.body.color,
-            "type": req.body.type,
-            "location": req.body.location,
+            // "type": req.body.type,
+            "location": Object.values(coordinate),
             "dateClean": req.body.dateClean
         }
     })
@@ -42,7 +46,7 @@ router.patch('/garbage/updatelocation',async(req,res)=>{
             index: 'garbage',
             type: '_doc',
             id: req.body.id,
-            // refresh: "wait_for",
+            refresh: "wait_for",
             body: {
               // put the partial document under the `doc` key
               doc: {
@@ -67,7 +71,7 @@ router.patch('/garbage/updatedate',async(req,res)=>{
             index: 'garbage',
             type: '_doc',
             id: req.body.id,
-            // refresh: "wait_for",
+            refresh: "wait_for",
             body: {
               // put the partial document under the `doc` key
               doc: {

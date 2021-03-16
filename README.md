@@ -26,3 +26,6 @@ The service supports RestAPI:
 - RestAPI
 - Dockers
 - elasticSearch
+
+
+In future, retrieve by location will be saved 10 minutes and update location will be saved 5 minutes in Cache - Redis
