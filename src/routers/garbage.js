@@ -1,10 +1,11 @@
-const { text } = require('express')
+const { text, response } = require('express')
 const express = require('express')
 const geocode = require('../utils/geocode')
-const {ElasticSearch} = require('../elasticDB')
+const {ElasticService} = require('../services/elasticService')
+// const GeoPoint = require('geopoint')
 
 const router = new express.Router()
-const elasticClient = new ElasticSearch()
+const elasticClient = new ElasticService()
 
 
 // router.use(function timeLog (req, res, next) {
@@ -17,18 +18,15 @@ router.post("/garbage", async(req, res) => {
     try{
         const coordinate = await geocode(req.body.location)
         console.log(coordinate)
-        // const client = elasticClient.getClient()
-        // console.log(client)
-    const response = await elasticClient.getClient().index({
-        index: 'garbage',
-        type: req.body.type,
+        const response = await elasticClient.getClient().index({
+        index: process.env.INDEX_ELASTIC,        
         body: {
-            // "id": req.body.id,
             "color": req.body.color,
-            // "type": req.body.type,
-            "location": Object.values(coordinate),
+            "type": req.body.type,
+            "location": coordinate,
             "dateClean": req.body.dateClean
         }
+        
     })
      res.status(200).send(response)
    } catch(e){
@@ -37,18 +35,17 @@ router.post("/garbage", async(req, res) => {
    
 })
 
-router.patch('/garbage/updatelocation',async(req,res)=>{
+router.patch('/garbage/updateLocation',async(req,res)=>{
     console.log("in update location")
     try{
         const client = elasticClient.getClient()
         console.log(client)
         const response = await client.update({
-            index: 'garbage',
-            type: '_doc',
+            index: process.env.INDEX_ELASTIC,
+            type: process.env.DOC_TYPE,
             id: req.body.id,
             refresh: "wait_for",
             body: {
-              // put the partial document under the `doc` key
               doc: {
                 location: req.body.location
               }
@@ -62,14 +59,14 @@ router.patch('/garbage/updatelocation',async(req,res)=>{
 
 })
 
-router.patch('/garbage/updatedate',async(req,res)=>{
+router.patch('/garbage/updateDate',async(req,res)=>{
     console.log("in update date")
     try{
         const client = elasticClient.getClient()
         console.log(client)
         const response = await client.update({
-            index: 'garbage',
-            type: '_doc',
+            index: process.env.INDEX_ELASTIC,
+            type: process.env.DOC_TYPE,
             id: req.body.id,
             refresh: "wait_for",
             body: {
@@ -86,7 +83,28 @@ router.patch('/garbage/updatedate',async(req,res)=>{
     }
 })
 
-router.get('/garbage/location',(req,res)=>{
+router.get('/garbage/location',async (req,res)=>{
+    try{
+
+        console.log("in Search location")
+        const client = elasticClient.getClient()
+        const coordinate = await geocode(req.body.location)
+        console.log(coordinate)
+        const response = await client.search({
+            index: process.env.INDEX_ELASTIC,
+            body:{
+                query: {
+                    geo_distance : {
+                        distance : process.env.DISTANCE,
+                        location: coordinate
+                    }
+                }
+            }
+        })
+        res.status(200).send(response)
+    }catch(e){
+        res.status(400).send(e)
+    }
 
 })
 
