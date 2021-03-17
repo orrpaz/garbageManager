@@ -1,7 +1,7 @@
 
 var elasticsearch = require('elasticsearch');
 
-class ElasticSearch{
+class ElasticService{
   constructor(){
     this.esClient = elasticsearch.Client({
       host: "http://127.0.0.1:9200",
@@ -24,15 +24,16 @@ class ElasticSearch{
       this.esClient.indices.create({
           // id: string,
           index: index,
-          // type: string,
-          // wait_for_active_shards: string,
-          // refresh: 'true' | 'false' | 'wait_for',
-          // routing: string,
-          // timeout: string,
-          // version: number,
-          // version_type: 'internal' | 'external' | 'external_gte',
-          // pipeline: string,
-          // body: object
+          body:{
+            mappings:{
+                properties: {
+                  location: {
+                    type: "geo_point"
+                  }
+                }
+              }
+            }
+          
         })
 
     } else {
@@ -42,4 +43,4 @@ class ElasticSearch{
   }
 }
 
-module.exports = {ElasticSearch}
+module.exports = {ElasticService}
